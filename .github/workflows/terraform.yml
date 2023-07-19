@@ -37,7 +37,7 @@ jobs:
 
     - name: Terraform Init
       working-directory: Kubernetes/stage-one/cluster/
-      run: terraform init -backend-config "bucket=terraformaws11" -backend-config "key=eks-prod.tfstate"
+      run: terraform init -reconfigure -backend-config "bucket=terraformaws11" -backend-config "key=eks-prod.tfstate"
            
     - name: Terraform Format
       working-directory: Kubernetes/stage-one/cluster/
