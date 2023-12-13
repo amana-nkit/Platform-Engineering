@@ -1,6 +1,8 @@
 # Amazon EKS Best Practices Guide:
 
-## Security: There are several security best practice areas that are pertinent when using a managed Kubernetes service like EKS
+## Security
+
+There are several security best practice areas that are pertinent when using a managed Kubernetes service like EKS
 
 * Identity and Access Management
 * Pod Security
@@ -113,7 +115,7 @@ Auditing and Logging - Collecting and analyzing audit logs is useful. Logs can h
 apiVersion: audit.k8s.io/v1beta1
 kind: Policy
 rules:
-  # Log aws-auth configmap changes
+  #### Log aws-auth configmap changes
   - level: RequestResponse
     namespaces: ["kube-system"]
     verbs: ["update", "patch", "delete"]
@@ -193,8 +195,7 @@ rules:
     verbs: ["deletecollection"]
     omitStages:
       - "RequestReceived"
-  # Secrets, ConfigMaps, and TokenReviews can contain sensitive & binary data,
-  # so only log at the Metadata level.
+  #### Secrets, ConfigMaps, and TokenReviews can contain sensitive & binary data,so only log at the Metadata level.
   - level: Metadata
     resources:
       - group: "" # core
@@ -230,7 +231,7 @@ rules:
       - group: "storage.k8s.io"
     omitStages:
       - "RequestReceived"
-  # Default level for known APIs
+  #### Default level for known APIs
   - level: RequestResponse
     resources: 
       - group: "" # core
@@ -253,7 +254,7 @@ rules:
       - group: "storage.k8s.io"
     omitStages:
       - "RequestReceived"
-  # Default level for all other requests.
+  #### Default level for all other requests.
   - level: Metadata
     omitStages:
       - "RequestReceived"
@@ -446,7 +447,8 @@ Karpenter consolidates instance orchestration responsibilities within a single s
 2. Create diverse node configurations by instance type, using flexible workload provisioner options. Instead of managing many specific custom node groups, Karpenter could let you manage diverse workload capacity with a single, flexible provisioner.
 3. Achieve improved pod scheduling at scale by quickly launching nodes and scheduling pods.
 
-# Provisioner for GPU Instances with Taints
+* Provisioner for GPU Instances with Taints
+
 apiVersion: karpenter.sh/v1alpha5
 kind: Provisioner
 metadata:
@@ -464,6 +466,17 @@ spec:
     value: "true"
   ttlSecondsAfterEmpty: 60
 
+
+## Networking
+
+Amazon EKS implements cluster networking through Amazon VPC CNI(Container Network Interface). The CNI plugins allow kubernetes pods to have same IP address as they do for VPC network. More specifically, all containers inside the Pod share a network namespace, and they can communicate with each other using local ports
+
+### Amazon VPC CNI
+
+* CNI Binary, which will setup pod network to enable Pod-to-Pod communication. The CNI binary runs on node root file system and is invoked by Kubelet when a new Pod gets added to, or an existing Pod removed from node.
+
+* ipamd, a long running node-local IP Address Mangement (IPAM) daemon and is responsible for:
+managing ENIs on a node, and maintaining a warm pool of available IP addresses or prefix
 
 
 

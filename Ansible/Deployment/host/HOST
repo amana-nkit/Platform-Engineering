@@ -1,0 +1,9 @@
+[DC1_TEST_WIN]
+HOST1
+HOST2
+[DC1_TEST_WIN:vars]
+ansible_user=abcd60@AMAN.NET
+ansible_connection=winrm
+ansible_winrm_transport=ntlm
+ansible_ssh_port=5985
+ansible_winrm_server_cert_validation=ignore

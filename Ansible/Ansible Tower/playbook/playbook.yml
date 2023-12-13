@@ -1,0 +1,45 @@
+- hosts: "{{ HOST}}"
+
+  vars: 
+    source_file: "{{ file_path.split('/')[-1] }}"
+    dest_path: "/"
+
+  tasks:
+    - name: check if path exists
+      stat:
+        path: "{{dest_path}}"
+      register: checking_dest_status
+
+    - name: Create directory if path doesn't exist
+      file:
+        path: "{{dest_path}}"
+        state: directory
+        mode: 0755
+      when: checking_dest_status.state.isdir is not defined
+
+    - name: download the package
+      get_url:
+        url: "{{source_file}}"
+        dest: "{{dest_path}}"
+        validate_certs: false
+      register: download_output
+
+    - name: Unzip downloaded file to remote server
+      unarchieve:
+        src: "{{dest_path}}/{{source_file}}"
+        dest: "{{dest_path}}"
+        mode: 0755
+        remote_src: yes
+        list_file: yes
+      register: Unarchieve_output
+      when: download_output as succeded
+
+    - debug: 
+        var: Unarchieve_output.files
+      when: Unarchieve_output is succeded
+
+    - name: remove zip file on target machine
+      file:
+        path: "{{dest_path}}/{{source_file}}"
+        state: absent
+      when: Unarchieve_output is succeded

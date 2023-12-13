@@ -1,0 +1,29 @@
+---
+  - name: Download and copy file to windows server
+    hosts: "{{ variable_host }}"
+    become: true
+    vars:
+    - file_path: "{{ ANSIBLE_SOURCE_DIRECTORY }}"
+    - dest_path: "{{ ANSIBLE_DEST_DIRECTORY }}"
+
+  tasks:
+    - name: Check if path exists
+      ansible.windows.win_stat:
+        path: "{{ dest_path }}"
+      register: p
+
+    - name: Print a debug message
+      ansible.builtin.debug:
+        msg: "Path exists and is a directory"
+      when: p.stat.isdir is defined and p.stat.isdir
+
+    - name: Create a folder if it doesn't exist
+      ansible.windows.win_file:
+        path: "{{ dest_path }}"
+        state: touch
+      when: not p.stat.exists
+
+    - name: Copy files where source on remote hosts
+      ansible.windows.win_copy:
+        src: "{{ file_path }}"
+        dest: "{{ dest_path }}"
