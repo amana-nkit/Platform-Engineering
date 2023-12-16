@@ -1,0 +1,5 @@
+- name: install git
+  package:
+    name: telnet
+    state: present
+    

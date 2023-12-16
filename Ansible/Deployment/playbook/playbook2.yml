@@ -1,0 +1,35 @@
+- hosts: "{{ HOST }}"
+
+  vars:
+    target_file: "{{ ART_path.split('/')[-1] }}"
+
+  tasks:
+    - name: Download the package
+      get_url: 
+        url: "{{ ART_Path }}"
+        dest: "{{ src_path }}"
+        url_username: "{{user_name}}"
+        url_password: "{{user_password}}"
+        mode: 0755
+        validate_certs: false
+      register: download_output
+
+    - name: Unarchieve the downloaded file to remote server
+      unarchive:
+        src: "{{ src_path}}/{{target_file}}"
+        dest: "{{dest_path}}"
+        mode: 0755
+        remote_src: yes
+        list_files: yes
+      register: unarchive_output
+      when: download_output is succeeded
+
+    - debug:
+        var: unarchive_output.files
+      when: unarchive_output is succeeded 
+
+    - name: Remove zip file on target machine
+      file:
+        path: "{{ src_path}}/{{target_file}}"
+        state: absent
+      when: unarchive_output is succeeded 

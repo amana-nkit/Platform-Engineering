@@ -1,0 +1,16 @@
+- hosts: "{{ HOST }}"
+
+  tasks:
+    - name: Rest API 
+      uri:
+        url: https://www.bogotobogo.com/DevOps/Ansible/Ansible-SSH-Connection-Setup-Run-Command.php#google_vignette
+        method: GET
+        status_code:
+          - 200
+      register: api_response
+
+
+    - name: debug
+      debug:
+        msg: "{{ api_response.json.status | json.query('[].fields.summary') }}"
+          

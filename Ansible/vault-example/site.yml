@@ -1,0 +1,11 @@
+---
+- name: Using secrets in playbook
+  hosts: "{{ HOST }}"
+  become: true
+  vars_files:
+    - user-passwd.yml
+  tasks: 
+    - name: Create user
+      user:
+        name: "{{ username }}"
+        password: "{{ passwd | password_hash('sha256') }}"

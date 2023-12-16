@@ -1,0 +1,10 @@
+---
+- name: install all required packages
+  hosts: "{{ HOST }}"
+  gather_facts: no
+  roles:
+    - install-git
+    - install-httpd
+    - install-telnet
+    - amanankit.git
+...

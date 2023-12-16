@@ -1,0 +1,17 @@
+---
+- name: Install Apache on RHEL servers
+  hosts: "{{ HOST }}"
+  tasks:
+    - name: Install the latest version of Apache
+      dnf:
+        name: httpd
+        state: latest
+      
+      notify:
+        - Start Apche
+
+  handlers:
+    - name: Start Apache
+      service: 
+        name: httpd
+        state: started

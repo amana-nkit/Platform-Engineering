@@ -1,0 +1,19 @@
+---
+- name: Loops and Task control
+  hosts: "{{ HOST }}"
+  become: true
+  tasks:
+    - name: Install Packages
+      yum:
+        name:
+          - httpd
+          - firewall
+        state: present
+    - name: Enable service
+      service:
+        name: "{{ item }}"
+        state: started
+        enable: true
+      loop:
+        - httpd
+        - firewall
