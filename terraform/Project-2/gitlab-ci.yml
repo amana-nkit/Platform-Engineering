@@ -1,1 +1,43 @@
--c
+stages:
+    - validate
+    - plan
+    - apply
+    - destroy 
+    
+variables:
+    ADDRESS: "http://192.168.56.10:8080/api/v4/projects/1/terraform/state"
+    PROJECT_NAME: Project-2
+    USER_NAME: devops-aman
+    TOKEN: "Gplat-ZEnkufcr-2efg"
+
+images:
+    name: hashicorp/terraform
+    entrypoint: [""]
+
+before_script:
+    - terraform init -backend-config="address=$ADDRESS/$PROJECT_NAME" -backend-config="lock_address=
+    $ADDRESS/$PROJECT_NAME/lock" -backend-config="unlock_address=$ADDRESS/$PROJECT_NAME/lock" 
+    -backend-config=username="devops" -backend-config=password="gplat-zxerfgty435glk" -backend-config=
+    lock_method=POST -backend-config=unlock_method=DELETE -backend-config=retry_wait_min=5 -force-copy
+
+init_step:
+    stage: validate
+    script:
+        - terraform validate
+
+plan_step:
+    stage: plan
+    script:
+        - terraform plan
+
+apply_step:
+    stage: apply
+    script:
+        - terraform apply -auto-approve
+    when: manual
+
+destroy_step:
+    stage: destroy
+    script:
+        - terraform destroy -auto-approve
+    when: manual
