@@ -1,0 +1,23 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  IMAGE_NAME: registry.gitlab.com/nextlink/gitlab-presentation/sample-helm-cicd-demo
+  DOCKER_HOST: tcp://localhost:2375/
+
+build:
+  stage: build
+  image: docker:18-git
+  services:
+    - docker:18-dind
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+    - docker build -f Dockerfile --tag ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
+    - docker push ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
+
+deploy:
+  stage: deploy
+  image: alpine/helm:3.5.4
+  script:
+    - helm upgrade sample-helm-cicd-demo ./deploy --install --set-string image.tag=${CI_COMMIT_SHORT_SHA} --namespace sample-helm-cicd-demo --timeout 30m0s
