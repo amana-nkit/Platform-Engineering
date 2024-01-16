@@ -1,0 +1,6 @@
+import os
+directory = "C:\\playbook"
+files = os.listdir(directory)
+for i in range(len(files)):
+     if files[i].endswith('.yml'):
+         print(files[i])
