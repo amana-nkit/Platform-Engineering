@@ -1,0 +1,52 @@
+---
+- name: Deployment
+  hosts: "{{ HOST }}"
+  vars:
+    target_file: "{{ ART_Path('/')[-1] }}"
+
+  tasks:
+  - name: Check dest path
+    stat:
+      path: "{{ dest_path }}"
+    register: dest_path_output
+
+  - name: Create directory if it doesn't exist
+    file:
+      path: "{{ dest_path }}"
+      state: directory
+      mode: 0755
+    register: create_directory_output 
+    when: dest_path_output.state.isdir is not defined
+
+  - name: Download the package
+    get_url:
+      url: "{{ ART_Path }}"
+      dest: "{{ src_path }}"
+      url_usrname: "{{ user_name }}"
+      url_passwd: "{{ user_passwd }}"
+      validate_certs: false
+    register: download_package_output
+    when: create_directory_output is succeeded
+
+  - name: Unarchive the file to remote host
+    unarchive:
+      src: "{{ src_path }}/{{ target_file }}"
+      dest: "{{ dest_path }}"
+      mode: 0755
+      remote_src: yes
+      list_files: yes
+    register: unarchive_output
+    when: download_package_output is succeeded
+
+  - name: Debug
+    debug:
+      var: "{{ unarchive_output }}"
+    when: unarchive_output is succeeded
+
+  - name: Remove the file from src
+    file:
+      path: "{{ src_path }}/{{ target_file }}"
+      state: absent
+      mode: 0755
+    register: remove_file_output
+    when: unarchive_output is succeeded
