@@ -21,3 +21,11 @@ deploy:
   image: alpine/helm:3.5.4
   script:
     - helm upgrade sample-helm-cicd-demo ./deploy --install --set-string image.tag=${CI_COMMIT_SHORT_SHA} --namespace sample-helm-cicd-demo --timeout 30m0s
+
+test-code:
+  stage: test
+  needs: deploy-code
+  script:
+    - echo "Run your tests here."
+    - cd to/your/desired/folder
+    - npm run test
